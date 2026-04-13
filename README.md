@@ -126,4 +126,4 @@ O retry atual não distingue rate limit (429) de erro de servidor (502). O ideal
 Cobertura de testes não é medida nem imposta. Adicionaria `pytest-cov` com um threshold mínimo para garantir que regressões de cobertura sejam detectadas no CI.
 
 ### Performance
-O `pool_timeout` do SQLAlchemy usa o valor padrão (30s), enquanto o timeout do LLM pode chegar a 30s também. Requests que chegam enquanto todas as conexões do pool estão ocupadas aguardando respostas do LLM podem falhar por timeout de pool antes mesmo de chegar ao banco. O `pool_timeout` deveria ser configurado em função do `llm_timeout_seconds`.
+A conexão com o banco é aberta no início de cada request e mantida aberta durante toda a chamada ao LLM, mesmo sem nenhuma query sendo executada. Em cenários de alta concorrência com respostas lentas do LLM, isso pode esgotar o pool de conexões — não por sobrecarga do banco, mas por conexões ociosas presas esperando o LLM. A solução seria abrir a conexão apenas no momento do `save()`, desacoplando o ciclo de vida da sessão do ciclo de vida do request.

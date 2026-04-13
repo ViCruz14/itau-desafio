@@ -1,7 +1,7 @@
 [project]
-name = "llm-gateway"
+name = "itau-llm-gateway"
 version = "0.1.0"
-description = "LLM Gateway microservice — Clean Architecture"
+description = "LLM Gateway microservice"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.0",
