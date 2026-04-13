@@ -3,7 +3,12 @@ import time
 
 import litellm
 from fastapi import HTTPException
-from tenacity import retry, retry_if_not_exception_type, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_not_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from application.ports.llm_provider import LLMProvider
 from config.settings import Settings
@@ -27,13 +32,17 @@ class LiteLLMProvider(LLMProvider):
             start = time.monotonic()
             try:
                 response = await asyncio.wait_for(
-                    litellm.acompletion(model=model, messages=[{"role": "user", "content": prompt}]),
+                    litellm.acompletion(
+                        model=model, messages=[{"role": "user", "content": prompt}]
+                    ),
                     timeout=self._timeout,
                 )
                 latency_ms = int((time.monotonic() - start) * 1000)
                 return response.choices[0].message.content, latency_ms
             except asyncio.TimeoutError:
-                raise HTTPException(status_code=504, detail=f"LLM timed out after {self._timeout}s.")
+                raise HTTPException(
+                    status_code=504, detail=f"LLM timed out after {self._timeout}s."
+                )
             except Exception as exc:
                 raise HTTPException(status_code=502, detail=str(exc))
 

@@ -7,7 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from application.ports.llm_provider import LLMProvider
 from application.use_cases.create_completion import CreateCompletion
 from config.settings import Settings
-from infrastructure.database.repositories.pg_completion_repository import PgCompletionRepository
+from infrastructure.database.repositories.pg_completion_repository import (
+    PgCompletionRepository,
+)
 
 
 @lru_cache

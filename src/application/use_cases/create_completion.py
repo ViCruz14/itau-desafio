@@ -1,4 +1,7 @@
-from application.dtos.completion_dto import CreateCompletionInput, CreateCompletionOutput
+from application.dtos.completion_dto import (
+    CreateCompletionInput,
+    CreateCompletionOutput,
+)
 from application.ports.completion_repository import CompletionRepository
 from application.ports.llm_provider import LLMProvider
 from domain.entities.completion import Completion
@@ -23,7 +26,9 @@ class CreateCompletion:
         )
 
         try:
-            response, latency_ms = await self._llm_provider.complete(input_dto.prompt, self._model)
+            response, latency_ms = await self._llm_provider.complete(
+                input_dto.prompt, self._model
+            )
             completion.mark_success(response, latency_ms)
             await self._repository.save(completion)
         except Exception as exc:
