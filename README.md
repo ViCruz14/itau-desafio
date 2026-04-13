@@ -90,11 +90,13 @@ uv sync
 uv run pytest -m "not integration"
 ```
 
-### Todos os testes (requer PostgreSQL rodando)
+### Todos os testes
 
 ```bash
-TEST_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5434/llm_gateway uv run pytest
+uv run pytest
 ```
+
+Os testes de integração sobem um container PostgreSQL automaticamente via [testcontainers](https://testcontainers.com/). É necessário apenas que o Docker esteja rodando.
 
 ### Estrutura dos testes
 
@@ -111,3 +113,17 @@ tests/
 ```bash
 uv run ruff check src tests
 ```
+
+## Melhorias identificadas
+
+### Segurança
+A API não possui autenticação. Em produção, adicionaria validação de JWT via dependency do FastAPI, protegendo o endpoint de uso não autorizado e prevenindo custos inesperados com o provedor de LLM.
+
+### Resiliência
+O retry atual não distingue rate limit (429) de erro de servidor (502). O ideal seria respeitar o header `Retry-After` retornado pelo provedor em caso de 429.
+
+### Qualidade
+Cobertura de testes não é medida nem imposta. Adicionaria `pytest-cov` com um threshold mínimo para garantir que regressões de cobertura sejam detectadas no CI.
+
+### Performance
+O `pool_timeout` do SQLAlchemy usa o valor padrão (30s), enquanto o timeout do LLM pode chegar a 30s também. Requests que chegam enquanto todas as conexões do pool estão ocupadas aguardando respostas do LLM podem falhar por timeout de pool antes mesmo de chegar ao banco. O `pool_timeout` deveria ser configurado em função do `llm_timeout_seconds`.

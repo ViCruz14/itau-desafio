@@ -1,27 +1,31 @@
-import os
-
+import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from testcontainers.postgres import PostgresContainer
 
-from config.settings import Settings
+from infrastructure.database.connection import Base
+from infrastructure.database.models.completion_model import (  # noqa: F401
+    CompletionModel,
+)
+
+
+@pytest.fixture(scope="session")
+def postgres_url():
+    with PostgresContainer("postgres:16-alpine") as postgres:
+        yield postgres.get_connection_url().replace("psycopg2", "asyncpg")
 
 
 @pytest_asyncio.fixture
-async def engine():
-    settings = Settings()
-    url = os.getenv("TEST_DATABASE_URL", settings.database_url)
-    e = create_async_engine(url, echo=False)
+async def engine(postgres_url):
+    e = create_async_engine(postgres_url, echo=False)
+    async with e.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield e
     await e.dispose()
 
 
 @pytest_asyncio.fixture
 async def session(engine):
-    """
-    Wraps each test in a transaction rolled back at teardown.
-    The 'create_savepoint' mode makes session.commit() release a SAVEPOINT
-    instead of committing the outer transaction, preserving test isolation.
-    """
     async with engine.connect() as conn:
         await conn.begin()
         s = AsyncSession(
