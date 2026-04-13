@@ -12,7 +12,6 @@ class CreateCompletionRequest(BaseModel):
 class CompletionResponse(BaseModel):
     id: UUID
     user_id: str
-    prompt: str
     response: str | None
     model: str
     created_at: datetime

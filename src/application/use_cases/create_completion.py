@@ -39,7 +39,6 @@ class CreateCompletion:
         return CreateCompletionOutput(
             id=completion.id,
             user_id=completion.user_id,
-            prompt=completion.prompt,
             response=completion.response,
             model=completion.model,
             created_at=completion.created_at,

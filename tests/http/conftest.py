@@ -18,7 +18,6 @@ def mock_output():
     return CreateCompletionOutput(
         id=uuid4(),
         user_id="user-1",
-        prompt="Hello",
         response="Hi there",
         model="gemini/gemini-2.5-flash",
         created_at=datetime.now(timezone.utc),

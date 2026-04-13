@@ -117,7 +117,7 @@ uv run ruff check src tests
 ## Melhorias identificadas
 
 ### Segurança
-A API não possui autenticação. Em produção, adicionaria validação de JWT via dependency do FastAPI, protegendo o endpoint de uso não autorizado e prevenindo custos inesperados com o provedor de LLM.
+A API não possui autenticação. Em produção, adicionaria validação de JWT via dependency do FastAPI, protegendo o endpoint de uso não autorizado e prevenindo custos inesperados com o provedor de LLM. Com JWT, o `user_id` passaria a ser extraído do token — deixando de ser um campo obrigatório no body da requisição.
 
 ### Resiliência
 O retry atual não distingue rate limit (429) de erro de servidor (502). O ideal seria respeitar o header `Retry-After` retornado pelo provedor em caso de 429.
